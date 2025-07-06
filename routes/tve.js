@@ -10,9 +10,9 @@ exports.GetChannelsFromWeb = async function () {
   }).then((data) => {
     if (data?.countries === undefined) throw Error("Invalid response!")
     let channels = []
-    data.countries[0].ambits.filter((x) => ["Generalistas", "Informativos", "Deportivos", "Infantiles"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) =>
-      x.options.some((opt) => opt.format !== "youtube")
-    )))
+    data.countries[0].ambits.filter((x) => ["Generalistas", "Informativos", "Deportivos", "Infantiles"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) => {
+      return (x.options.some((opt) => (opt.format !== "youtube" && opt.format !== "stream")) || x.options.length < 1) && x.name !== "El Toro TV"
+    })))
     channels = channels.map((x) => {
       return {
         id: `tve:${x.name}`, //x.epg_id ???
@@ -73,9 +73,9 @@ exports.GetChannelStreams = function (channelName) {
   }).then((data) => {
     if (data?.countries === undefined) throw Error("Invalid response!")
     let channels = [], streams = []
-    data.countries[0].ambits.filter((x) => ["Generalistas", "Informativos", "Deportivos", "Infantiles"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) =>
-      x.options.some((opt) => opt.format !== "youtube")
-    )))
+    data.countries[0].ambits.filter((x) => ["Generalistas", "Informativos", "Deportivos", "Infantiles"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) => {
+      return (x.options.some((opt) => (opt.format !== "youtube" && opt.format !== "stream")) || x.options.length < 1) && x.name !== "El Toro TV"
+    })))
     data.countries[1].ambits.filter((x) => ["Int. Europa"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) => x.name.includes("TVE"))))
     if (channelName) channels = channels.filter((x) => x.name === channelName)
     channels.forEach((x) => {

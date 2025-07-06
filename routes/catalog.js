@@ -35,7 +35,9 @@ function HandleCatalogRequest(req, res, next) {
   let catalogPromise
   if (res.locals.extraParams) {
     if (res.locals.extraParams.skip) {
-      res.json({ metas: [], message: "End of catalog" })
+      catalogPromise = Promise.reject("End of catalog")
+      res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
+      res.json({ metas: [] })
       next()
     }/* else if (res.locals.extraParams.search) {
 
