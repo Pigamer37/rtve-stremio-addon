@@ -3,7 +3,7 @@ const metas = express.Router()
 
 require('dotenv').config()//process.env.var
 
-const tveAPI = require('./tve.js')
+const rtveAPI = require('./rtve.js')
 
 /**
  * Tipical express middleware callback.
@@ -23,7 +23,7 @@ function HandleMetaRequest(req, res, next) {
   const idDetails = req.params.videoId.split(':')
   const videoID = idDetails[0] //We only want the first part of the videoID, which is the IMDB ID, the rest would be the season and episode
   if (videoID === "tve") {
-    tveAPI.GetChannel(req.params.videoId).then((result) => {
+    rtveAPI.GetChannel(req.params.videoId).then((result) => {
       console.log("\x1b[36mGot metadata for\x1b[39m", idDetails[1])
       res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
       res.json({ meta: result, message: "Got metadata!" });
@@ -32,6 +32,19 @@ function HandleMetaRequest(req, res, next) {
       console.error('\x1b[31mFailed on tve id search:\x1b[39m ' + err)
       if (!res.headersSent) {
         res.json({ meta: {}, message: "Failed getting tve channel info" });
+        next()
+      }
+    })
+  } else if (videoID === "rne") {
+    rtveAPI.GetRadio(req.params.videoId).then((result) => {
+      console.log("\x1b[36mGot metadata for\x1b[39m", idDetails[1])
+      res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
+      res.json({ meta: result, message: "Got metadata!" });
+      next()
+    }).catch((err) => {
+      console.error('\x1b[31mFailed on radio id search:\x1b[39m ' + err)
+      if (!res.headersSent) {
+        res.json({ meta: {}, message: "Failed getting re station info" });
         next()
       }
     })

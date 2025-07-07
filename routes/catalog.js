@@ -3,7 +3,7 @@ const catalog = express.Router()
 
 require('dotenv').config()//process.env.var
 
-const tveAPI = require('./tve.js')
+const tveAPI = require('./rtve.js')
 
 /**
  * Tipical express middleware callback.
@@ -42,17 +42,19 @@ function HandleCatalogRequest(req, res, next) {
     }/* else if (res.locals.extraParams.search) {
 
     }*/
+  } else if (req.params.videoId === "radio") {
+    catalogPromise = tveAPI.GetRadios()
   } else {
     catalogPromise = tveAPI.GetChannels()
   }
   catalogPromise.then((result) => {
-    console.log('\x1b[36mGot tve metadata for:\x1b[39m', result.length, "search results")
+    console.log('\x1b[36mGot metadata for:\x1b[39m', result.length, "search results")
     const metas = result
     res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
-    res.json({ metas, message: "Got tve metadata!" });
+    res.json({ metas, message: "Got catalog metadata!" });
     next()
   }).catch((err) => {
-    console.error('\x1b[31mFailed on tve search because:\x1b[39m ' + err)
+    console.error('\x1b[31mFailed on catalog search because:\x1b[39m ' + err)
     if (!res.headersSent) {
       res.json({ metas: [], message: "Failed getting tve info" });
       next()

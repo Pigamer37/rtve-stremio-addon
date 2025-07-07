@@ -23,12 +23,16 @@ function ReadManifest() {
     let manifest = {
       "id": 'com.' + packageJSON.name.replaceAll('-', '.'),
       "version": packageJSON.version,
-      "name": "TVE",
-      "logo": "https://graph.facebook.com/tveInternacional/picture?width=256&height=256",
+      "name": "RTVE",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Logo_RTVE.svg/330px-Logo_RTVE.svg.png",
       "description": packageJSON.description,
       "catalogs": [
         {
-          id: "tve", type: "TV", name: "Live channels"/*,
+          id: "tv", type: "TV", name: "Live channels"/*,
+          extra: [{ name: "search", isRequired: false }]*/
+        },
+        {
+          id: "radio", type: "Radio", name: "Live radio"/*,
           extra: [{ name: "search", isRequired: false }]*/
         }
       ],
@@ -41,7 +45,8 @@ function ReadManifest() {
         "tv"
       ],
       "idPrefixes": [
-        "tve:"
+        "tve:",
+        "rne:"
       ],
       "stremioAddonsConfig": {
         "issuer": "https://stremio-addons.net",
@@ -110,8 +115,11 @@ app.use(catalog);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`\x1b[32mtve-stremio-addon is listening on port ${process.env.PORT || 3000}\x1b[39m`)
-  const tveAPI = require('./routes/tve.js')
-  tveAPI.UpdateChannelsFile().then(() => {
-    setInterval(tveAPI.UpdateChannelsFile.bind(tveAPI), 86400000); //Update every 24h
+  const rtveAPI = require('./routes/rtve.js')
+  rtveAPI.UpdateChannelsFile().then(() => {
+    setInterval(rtveAPI.UpdateChannelsFile.bind(rtveAPI), 86400000); //Update every 24h
+  })
+  rtveAPI.UpdateStationsFile().then(() => {
+    setInterval(rtveAPI.UpdateStationsFile.bind(rtveAPI), 86400000); //Update every 24h
   })
 });

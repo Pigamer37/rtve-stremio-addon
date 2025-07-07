@@ -3,7 +3,7 @@ const stream = express.Router()
 
 require('dotenv').config()//process.env.var
 
-const tveAPI = require('./tve.js')
+const rtveAPI = require('./rtve.js')
 
 /**
  * Tipical express middleware callback.
@@ -34,7 +34,7 @@ function HandleStreamRequest(req, res, next) {
   const idDetails = req.params.videoId.split(':')
   const videoID = idDetails[0]
   if (videoID === "tve") {
-    tveAPI.GetChannelStreams(idDetails[1]).then((result) => {
+    rtveAPI.GetChannelStreams(idDetails[1]).then((result) => {
       console.log('\x1b[36mGot\x1b[39m', result.length, "streams for", idDetails[1])
       res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
       res.json({ streams: result, message: "Got streams!" });
@@ -43,6 +43,19 @@ function HandleStreamRequest(req, res, next) {
       console.error('\x1b[31mFailed on channel searh because:\x1b[39m ' + err)
       if (!res.headersSent) {
         res.json({ streams: [], message: "Failed getting tve info" });
+        next()
+      }
+    })
+  } else if (videoID === "rne") {
+    rtveAPI.GetRadioStreams(idDetails[1]).then((result) => {
+      console.log('\x1b[36mGot\x1b[39m', result.length, "streams for", idDetails[1])
+      res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
+      res.json({ streams: result, message: "Got streams!" });
+      next()
+    }).catch((err) => {
+      console.error('\x1b[31mFailed on radio searh because:\x1b[39m ' + err)
+      if (!res.headersSent) {
+        res.json({ streams: [], message: "Failed getting re info" });
         next()
       }
     })
