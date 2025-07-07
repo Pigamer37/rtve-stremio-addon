@@ -11,22 +11,10 @@ exports.GetChannelsFromWeb = async function () {
     if (data?.countries === undefined) throw Error("Invalid response!")
     let channels = []
     data.countries[0].ambits.filter((x) => ["Generalistas", "Informativos", "Deportivos", "Infantiles"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) => {
-      return (x.options.some((opt) => (opt.format !== "youtube" && opt.format !== "stream")) || x.options.length < 1) && x.name !== "El Toro TV"
+      return (x.options.some((opt) => (opt.format !== "youtube" && opt.format !== "stream")) || x.options.length < 1) && !x.extra_info.includes("NOEM") && x.name !== "El Toro TV"
     })))
+    data.countries[1].ambits.filter((x) => ["Int. Europa"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) => x.name.includes("TVE"))))
     channels = channels.map((x) => {
-      return {
-        id: `tve:${x.name}`, //x.epg_id ???
-        type: "tv",
-        name: x.name,
-        logo: x.logo,
-        country: "Spain",
-        website: x.web,
-        poster: x.logo,
-        posterShape: "square",
-        behaviorHints: { countryWhitelist: "esp" }
-      }
-    })
-    data.countries[1].ambits.filter((x) => ["Int. Europa"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) => x.name.includes("TVE")).map((x) => {
       return {
         id: `tve:${x.name}`, //x.epg_id ???
         type: "tv",
@@ -37,7 +25,7 @@ exports.GetChannelsFromWeb = async function () {
         poster: x.logo,
         posterShape: "square"
       }
-    })))
+    })
     return channels
   })
 }
@@ -84,7 +72,8 @@ exports.GetChannelStreams = function (channelName) {
           streams.push({
             url: option.url,
             name: x.name,
-            description: option.url
+            description: option.url,
+            ...((option.geo2 !== null || x.extra_info.includes("GEO")) ? { behaviorHints: { countryWhitelist: "esp" } } : {}) //If the channel is geo-blocked, add a hint to the client
           })
       }
       streams.push({ externalUrl: x.web, name: `${x.name} web (external)`, description: x.web })
