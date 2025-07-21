@@ -1,10 +1,10 @@
-# [RTVE Stremio addon](https://tve-stremio-addon.vercel.app/manifest.json)
+# [RTVE Stremio addon](https://rtve-stremio-addon.vercel.app/manifest.json)
 <p align="center"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Logo_RTVE.svg/330px-Logo_RTVE.svg.png" alt="TVE logo"/></p>
 
 Node.js addon to add TVE (Spanish Television) functionallity to Stremio, not affiliated with TVE. (I'm new to backend so I'm using it as a learning experience).
 
 ## Normal use:
-### Install by copying <stremio://tve-stremio-addon.vercel.app/manifest.json> on your browser or paste <https://tve-stremio-addon.vercel.app/manifest.json> on the stremio addons search bar
+### Install by copying <stremio://rtve-stremio-addon.vercel.app/manifest.json> on your browser or paste <https://rtve-stremio-addon.vercel.app/manifest.json> on the stremio addons search bar
 This addon provides metadata and streaming options from Spanish Television channels (TVE). It offers two catalogs with live TV channels and radio stations respectively. Additionally, when you open one of the channels, the platform will call this addon. When the program can get the data for the item you are requesting, some metadata will be provided and/or streaming options will be offered (the ones marked as external just open the link on your browser).
 
 ## Tips are welcome:
