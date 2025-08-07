@@ -1,0 +1,209 @@
+openapi: 3.1.0
+info:
+  title: RTVE Stremio addon
+  description: This API provides japanese subtitles for a variety of media, and
+    conforms to the Stremio addon specs.
+  version: 1.0.0
+tags:
+  - name: catalog
+  - name: meta
+  - name: stream
+servers:
+  - url: "https://rtve-stremio-addon.vercel.app"
+    description: "Please don't abuse the API, it's meant to be used by Stremio users and misuse may cost money"
+components:
+  parameters:
+    type:
+      name: type
+      in: path
+      required: true
+      description: Type of media
+      schema:
+        type: string
+        enum:
+          - TV
+          - Radio
+      example: TV
+    ID:
+      name: ID
+      in: path
+      required: true
+      description: ID of media for which the subtitles are requested.
+      schema:
+        type: string
+      example: tve:La 1
+  schemas:
+    meta:
+      type: object
+      properties:
+        id:
+          type: string
+          example: tve:La 1
+        type: 
+          type: string
+          enum:
+            - tv
+          example: tv
+        name:
+          type: string
+          description: Name of the channel or radio station
+          example: La 1
+        logo:
+          type: string
+          description: URL to the logo of the channel or radio station
+        country: 
+          type: string
+          enum:
+            - Spain
+          example: Spain
+        website:
+          type: string
+          description: URL to the logo of the channel or radio station
+        poster:
+          type: string
+          description: URL to the logo of the channel or radio station
+        posterShape:
+          type: string
+          enum:
+            - square
+          example: square
+paths:
+  /catalog/{type}/{ID}.json:
+    get:
+      tags:
+        - catalog
+      summary: Get catalog object
+      description: Gets a full list of channels or radio stations, depending on the type specified.
+      operationId: getCatalog
+      parameters:
+        - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/ID'
+      responses:
+        "200":
+          description:
+            If the API is up, it will always return a 200 OK response. You'll
+            have to parse the response to see if it was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metas:
+                    type: array
+                    description: List of channels/stations
+                    items:
+                      $ref: '#/components/schemas/meta'
+                  message:
+                    type: string
+                    description:
+                      A message indicating the status of the request. If successful, it
+                      will be 'Got catalog metadata!', otherwise it holds
+                      information about the error.
+                example:
+                  metas:
+                    - id: tve:La 1
+                      type: tv
+                      name: La 1
+                      logo: https://pbs.twimg.com/profile_images/1921959108862709760/fe5Tqhlh_200x200.jpg
+                      country: Spain
+                      website: https://www.rtve.es/play/videos/directo/la-1/
+                      poster: https://pbs.twimg.com/profile_images/1921959108862709760/fe5Tqhlh_200x200.jpg
+                      posterShape: square
+                    - id: rne:COPE
+                      type: radio
+                      name: COPE
+                      logo: https://...
+                      country: Spain
+                      website: https://www.cope.es/
+                      poster: https://...
+                      posterShape: square
+                  message: Got catalog metadata!
+  /meta/{type}/{ID}.json:
+      get:
+        tags:
+          - meta
+        summary: Get catalog object
+        description: Gets metadata for the requested resource, which can be a channel or a radio station.
+        operationId: getMeta
+        parameters:
+        - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/ID'
+        responses:
+          "200":
+            description:
+              If the API is up, it will always return a 200 OK response. You'll
+              have to parse the response to see if it was successful.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    meta:
+                      $ref: '#/components/schemas/meta'
+                    message:
+                      type: string
+                      description:
+                        A message indicating the status of the request. If successful
+                        it will be 'Got metadata!', otherwise it holds
+                        information about the error.
+                  example:
+                    meta:
+                      id: tve:La 1
+                      type: tv
+                      name: La 1
+                      logo: https://pbs.twimg.com/profile_images/1921959108862709760/fe5Tqhlh_200x200.jpg
+                      country: Spain
+                      website: https://www.rtve.es/
+                      poster: https://pbs.twimg.com/profile_images/1921959108862709760/fe5Tqhlh_200x200.jpg
+                      posterShape: square
+                    message: Got metadata!
+  /stream/{type}/{ID}.json:
+    get:
+      tags:
+        - stream
+      summary: Get stream object
+      description: Gets the stream for the requested resource, which can be a channel or a radio station.
+      operationId: getStream
+      parameters:
+        - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          description:
+            If the API is up, it will always return a 200 OK response. You'll
+            have to parse the response to see if it was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  streams:
+                    type: array
+                    description: List of streaming options for the channel or radio station.
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the streaming option.
+                        name:
+                          type: string
+                          description: Name of the streaming option.
+                        description:
+                          type: string
+                          description: URL of the streaming option.
+                  message:
+                    type: string
+                    description:
+                      A message indicating the status of the request. If successful, it
+                      will be 'Got stream!', otherwise it holds
+                      information about the error.
+                example:
+                  streams:
+                    - url: https://ztnr.rtve.es/ztnr/1688877.m3u8
+                      name: La 1
+                      description: https://ztnr.rtve.es/ztnr/1688877.m3u8
+                    - url: https://rtvelivestream.rtve.es/rtvesec/la1/la1_main_dvr.m3u8
+                      name: La 1
+                      description: https://rtvelivestream.rtve.es/rtvesec/la1/la1_main_dvr.m3u8
+                  message: Got streams!
