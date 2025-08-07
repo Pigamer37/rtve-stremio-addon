@@ -43,6 +43,7 @@ components:
           type: string
           enum:
             - tv
+            - radio
           example: tv
         name:
           type: string
@@ -55,7 +56,6 @@ components:
           type: string
           enum:
             - Spain
-          example: Spain
         website:
           type: string
           description: URL to the logo of the channel or radio station
@@ -66,7 +66,6 @@ components:
           type: string
           enum:
             - square
-          example: square
 paths:
   /catalog/{type}/{ID}.json:
     get:
@@ -122,7 +121,7 @@ paths:
       get:
         tags:
           - meta
-        summary: Get catalog object
+        summary: Get meta object
         description: Gets metadata for the requested resource, which can be a channel or a radio station.
         operationId: getMeta
         parameters:

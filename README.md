@@ -12,6 +12,7 @@ If you like the addon and would like to thank me monetarily, you can do so throu
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M4M219PJVI)
 
 ## Endpoints:
+Here is [a full documentation page](https://rtve-stremio-addon.apidocumentation.com/) and [the OpenAPI reference](OpenAPI.yaml).
 Here's the path to call it (parameters are marked by being enclosed in {} and described below):
 ```
 /{resource}/{type}/{ID}.json
