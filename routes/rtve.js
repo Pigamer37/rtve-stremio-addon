@@ -124,7 +124,10 @@ exports.GetChannelStreams = function (channelName) {
             url: option.url,
             name: x.name,
             description: option.url,
-            ...((option.geo2 !== null || x.extra_info.includes("GEO")) ? { behaviorHints: { countryWhitelist: "esp" } } : {}) //If the channel is geo-blocked, add a hint to the client
+            behaviorHints: {
+              notWebReady: true,
+              ...((option.geo2 !== null || x.extra_info.includes("GEO")) ? { countryWhitelist: "esp" } : {})
+            } //If the channel is geo-blocked, add a hint to the client
           })
       }
       streams.push({ externalUrl: x.web, name: `${x.name} web (external)`, description: x.web })
@@ -151,7 +154,10 @@ exports.GetRadioStreams = function (radioName) {
           url: option.url,
           name: x.name,
           description: option.url,
-          ...((option.geo2 !== null || x.extra_info.includes("GEO")) ? { behaviorHints: { countryWhitelist: "esp" } } : {}) //If the channel is geo-blocked, add a hint to the client
+          behaviorHints: {
+              notWebReady: true,
+              ...((option.geo2 !== null || x.extra_info.includes("GEO")) ? { countryWhitelist: "esp" } : {})
+          } //If the channel is geo-blocked, add a hint to the client
         })
       }
       streams.push({ externalUrl: x.web, name: `${x.name} web (external)`, description: x.web })
