@@ -126,7 +126,7 @@ exports.GetChannelStreams = function (channelName) {
             description: option.url,
             behaviorHints: {
               notWebReady: true,
-              ...((option.geo2 !== null || x.extra_info.includes("GEO")) ? { countryWhitelist: "esp" } : {})
+              ...((option.geo2 !== null || x.extra_info.includes("GEO")) ? { countryWhitelist: ["esp"] } : {})
             } //If the channel is geo-blocked, add a hint to the client
           })
       }
@@ -156,7 +156,7 @@ exports.GetRadioStreams = function (radioName) {
           description: option.url,
           behaviorHints: {
               notWebReady: true,
-              ...((option.geo2 !== null || x.extra_info.includes("GEO")) ? { countryWhitelist: "esp" } : {})
+              ...((option.geo2 !== null || x.extra_info.includes("GEO")) ? { countryWhitelist: ["esp"] } : {})
           } //If the channel is geo-blocked, add a hint to the client
         })
       }
