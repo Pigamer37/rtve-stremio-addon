@@ -34,6 +34,10 @@ function ReadManifest() {
         {
           id: "radio", type: "Radio", name: "Live radio"/*,
           extra: [{ name: "search", isRequired: false }]*/
+        },
+        {
+          id: "search", type: "search results", name: "RTVE Play",
+          extra: [{ name: "search", isRequired: true }]
         }
       ],
       "resources": [
@@ -42,11 +46,14 @@ function ReadManifest() {
         "catalog"
       ],
       "types": [
-        "tv"
+        "tv",
+        "movie",
+        "series"
       ],
       "idPrefixes": [
         "tve:",
-        "rne:"
+        "rne:",
+        "rtvep:"
       ],
       "stremioAddonsConfig": {
         "issuer": "https://stremio-addons.net",

@@ -4,6 +4,7 @@ const catalog = express.Router()
 require('dotenv').config()//process.env.var
 
 const tveAPI = require('./rtve.js')
+const rtvePlayAPI = require('./rtvePlay.js')
 
 /**
  * Tipical express middleware callback.
@@ -33,24 +34,28 @@ function HandleCatalogRequest(req, res, next) {
   console.log(`\x1b[96mEntered HandleCatalogRequest with\x1b[39m ${req.originalUrl}`)
   console.log('Extra parameters:', res.locals.extraParams)
   let catalogPromise
-  if (res.locals.extraParams) {
-    if (res.locals.extraParams.skip) {
+  if (req.params.videoId === "radio") {
+    if (res.locals.extraParams.skip !== undefined) {
       catalogPromise = Promise.reject("End of catalog")
-      res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
+      res.header('Cache-Control', "public, max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
       res.json({ metas: [] })
       next()
-    }/* else if (res.locals.extraParams.search) {
-
-    }*/
-  } else if (req.params.videoId === "radio") {
-    catalogPromise = tveAPI.GetRadios()
-  } else {
-    catalogPromise = tveAPI.GetChannels()
+    } else catalogPromise = tveAPI.GetRadios()
+  } else if (req.params.videoId === "tv") {
+    if (res.locals.extraParams.skip !== undefined) {
+      catalogPromise = Promise.reject("End of catalog")
+      res.header('Cache-Control', "public, max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
+      res.json({ metas: [] })
+      next()
+    } else catalogPromise = tveAPI.GetChannels()
+  } else if ((req.params.videoId === "search") && (res.locals.extraParams)) {
+    const query = res.locals.extraParams.search
+    catalogPromise = rtvePlayAPI.Search(query)
   }
   catalogPromise.then((result) => {
     console.log('\x1b[36mGot metadata for:\x1b[39m', result.length, "search results")
     const metas = result
-    res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
+    res.header('Cache-Control', "public, max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
     res.json({ metas, message: "Got catalog metadata!" });
     next()
   }).catch((err) => {
