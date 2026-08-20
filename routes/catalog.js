@@ -35,14 +35,14 @@ function HandleCatalogRequest(req, res, next) {
   console.log('Extra parameters:', res.locals.extraParams)
   let catalogPromise
   if (req.params.videoId === "radio") {
-    if (res.locals.extraParams.skip !== undefined) {
+    if (res.locals.extraParams?.skip !== undefined) {
       catalogPromise = Promise.reject("End of catalog")
       res.header('Cache-Control', "public, max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
       res.json({ metas: [] })
       next()
     } else catalogPromise = tveAPI.GetRadios()
   } else if (req.params.videoId === "tv") {
-    if (res.locals.extraParams.skip !== undefined) {
+    if (res.locals.extraParams?.skip !== undefined) {
       catalogPromise = Promise.reject("End of catalog")
       res.header('Cache-Control', "public, max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
       res.json({ metas: [] })
