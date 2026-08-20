@@ -112,6 +112,41 @@ async function GetItemInfo(id, type="video") {
     throw err
   }
 }
+//WIP
+function GetSeasonInfo(id, seasID, epNum) {
+  //https://www.rtve.es/play/videos/modulos/capitulos/1000646/1001463/
+  try { //batches of 20 episodes
+    const pageMax = Math.ceil(epNum / 20) //get number of pages needed to get all eps
+    let searchURL = new URL(`${RTVEPLAY_BASE}/videos/modulos/capitulos/${id}/${seasID}/`)
+
+    let promises = []
+    for (let pNum = 1; pNum <= pageMax; pNum++) {
+      searchURL.searchParams.set("page", pNum)
+      promises.push(ParseSeasonPage(searchURL))
+    }
+
+    return Promise.allSettled(promises).then((results) => {
+      const episodes = results.filter((prom) => (prom.value)).map((source) => source.value)
+      return episodes //TODO: concat array of episodes in each promise
+    })
+  } catch (err) {
+    console.error('\x1b[31mFailed on RTVE Play HTML metadata extraction because:\x1b[39m ' + err)
+    throw err
+  }
+}
+//WIP
+async function ParseSeasonPage(url) {
+  const html = await fetch(url).then((resp) => {
+    if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
+    if (resp === undefined) throw Error(`Undefined response!`)
+    return resp.text()
+  })
+
+  const $ = cheerio.load(html);
+  let episodes = []
+  //process page, episodes.push() with each ep data
+  return episodes
+}
 
 exports.Search = async function (query) {
   try {
