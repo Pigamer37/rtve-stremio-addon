@@ -4,6 +4,7 @@ const metas = express.Router()
 require('dotenv').config()//process.env.var
 
 const rtveAPI = require('./rtve.js')
+const rtvePlayAPI = require('./rtvePlay.js')
 
 /**
  * Tipical express middleware callback.
@@ -45,6 +46,19 @@ function HandleMetaRequest(req, res, next) {
       console.error('\x1b[31mFailed on radio id search:\x1b[39m ' + err)
       if (!res.headersSent) {
         res.json({ meta: {}, message: "Failed getting re station info" });
+        next()
+      }
+    })
+  } else if (videoID === "rtvep") {
+    rtvePlayAPI.GetMeta(req.params.videoId, req.params.type).then((result) => {
+      console.log("\x1b[36mGot metadata for\x1b[39m", idDetails[1])
+      res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
+      res.json({ meta: result, message: "Got metadata!" });
+      next()
+    }).catch((err) => {
+      console.error('\x1b[31mFailed on RTVE Play id meta search:\x1b[39m ' + err)
+      if (!res.headersSent) {
+        res.json({ meta: {}, message: "Failed getting rtvep info" });
         next()
       }
     })
