@@ -239,6 +239,7 @@ exports.Search = async function (query) {
 
     return Promise.allSettled([progsJSON/*, contentsJSON*/]).then((results) => {
       const resul = results.filter((prom) => (prom.value)).map((source) => source.value)
+      if (results[0].status === 'rejected') console.error('Program query failed:', results[0].reason)
       let ress = []
       for (ob of resul) {
         const validRes = ob?.page?.items?.filter(i => i.assetType !== "audio")
