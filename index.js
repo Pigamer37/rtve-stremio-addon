@@ -25,6 +25,7 @@ function ReadManifest() {
       "version": packageJSON.version,
       "name": "RTVE",
       "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Logo_RTVE.svg/330px-Logo_RTVE.svg.png",
+      "background": "https://img.rtve.es/n/937847",
       "description": packageJSON.description,
       "catalogs": [
         {
