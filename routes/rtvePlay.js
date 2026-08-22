@@ -231,13 +231,13 @@ exports.Search = async function (query) {
       if (resp === undefined) throw Error(`Undefined response!`)
       return resp.json()
     })
-    const contentsJSON = fetch(searchURLCont).then((resp) => {
-      if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
-      if (resp === undefined) throw Error(`Undefined response!`)
-      return resp.json()
-    })
+    // const contentsJSON = fetch(searchURLCont).then((resp) => {
+    //   if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
+    //   if (resp === undefined) throw Error(`Undefined response!`)
+    //   return resp.json()
+    // })
 
-    return Promise.allSettled([progsJSON, contentsJSON]).then((results) => {
+    return Promise.allSettled([progsJSON/*, contentsJSON*/]).then((results) => {
       const resul = results.filter((prom) => (prom.value)).map((source) => source.value)
       let ress = []
       for (ob of resul) {

@@ -1,11 +1,11 @@
 # [RTVE Stremio addon](https://rtve-stremio-addon.vercel.app/manifest.json)
 <p align="center"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Logo_RTVE.svg/330px-Logo_RTVE.svg.png" alt="TVE logo"/></p>
 
-Node.js addon to add RTVE (Spanish Television and radio) functionallity to Stremio, not affiliated with TTVE. (I'm new to backend so I'm using it as a learning experience).
+Node.js addon to add RTVE (Spanish Television and radio) functionallity to Stremio, not affiliated with RTVE. (I'm new to backend so I'm using it as a learning experience).
 
 ## Normal use:
 ### Install by copying <stremio://rtve-stremio-addon.vercel.app/manifest.json> on your browser or paste <https://rtve-stremio-addon.vercel.app/manifest.json> on the stremio addons search bar
-This addon provides metadata and streaming options from Spanish Television channels and Radio stations (RTVE). It offers two catalogs with live TV channels and radio stations respectively. Additionally, when you open one of the channels, the platform will call this addon. When the program can get the data for the item you are requesting, some metadata will be provided and/or streaming options will be offered (the ones marked as external just open the link on your browser).
+This addon provides metadata and streaming options for live Spanish Television channels and Radio stations (RTVE), and the on demand platform RTVE Play. It offers two catalogs with live TV channels and radio stations respectively, and RTVE Play search functionallity. Additionally, when you open one of the items, the platform will call this addon. When the program can get the data for the item you are requesting, some metadata will be provided and/or streaming options will be offered (the ones marked as external just open the link on your browser).
 
 ## Tips are welcome:
 If you like the addon and would like to thank me monetarily, you can do so through ko-fi. Thank you!\
@@ -19,8 +19,8 @@ Here's the path to call it (parameters are marked by being enclosed in {} and de
 ```
 Parameters
 1. `resource`: stream and meta are very self explanatory, and catalog exposes a list of channels.
-2. `type`: should not matter, but to make sure, use 'tv'.
-3. `ID`: `tve:{channelName}`/`rne:{stationName}`. `channelName/stationName` must be an exact match or it won't work.
+2. `type`: should not matter, but to make sure, use 'tv', 'radio', 'movie' or 'series' sepending on the expected result.
+3. `ID`: `tve:{channelName}`/`rne:{stationName}`/`rtvep:{RTVEPlayID}`. `channelName/stationName/RTVEPlayID` must be an exact match or it won't work.
 
 ## Run locally:
 > [!IMPORTANT]
@@ -45,15 +45,16 @@ Parameters
 > This application/addon uses TDTChannels list but is not endorsed, certified, or otherwise approved by TDTChannels.
 >
 > <p align="center"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Logo_RTVE.svg/330px-Logo_RTVE.svg.png" alt="TVE logo"/></p>
-> This application/addon serves RTVE IPTV sources, but is not endorsed, certified, or otherwise approved by RTVE.
+> This application/addon serves RTVE IPTV sources, and RTVE Play streams and metadata, but is not endorsed, certified, or otherwise approved by RTVE or RTVE Play.
 
 ## TO DO:
 - [X] Publish to Stremio Addon Catalog (not on Beam Up, because the beamup tool is not working for me)
-- [X] Support Metadata requests
+- [X] Support Metadata requests for TV and Radio
    - [X] Get logo
    - [ ] Get background
    - [ ] Get description
 - [ ] Make catalog searchable
+- [X] Support RTVE Play
 
 ### Enhancements/new features
 - [X] Add radio support

@@ -1,6 +1,6 @@
 {
   "name": "rtve-stremio-addon",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Node.js addon to add RTVE (Spanish Television & Radio) functionallity to Stremio, not affiliated with RTVE. GitHub repo: https://github.com/Pigamer37/rtve-stremio-addon",
   "main": "index.js",
   "scripts": {
