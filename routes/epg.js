@@ -1,6 +1,5 @@
 require('dotenv').config()
 
-//process.env.EPG_FILE_URL
 const channelIDMap = new Map([
   ["La 1", "LA1.es"],
   ["La 2", "La2.es"],
