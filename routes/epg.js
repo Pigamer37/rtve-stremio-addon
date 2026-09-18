@@ -103,7 +103,7 @@ function ProgrammeToObj(programme, channelID) {
     genres: programme.category?.map(cat => cat['_value']),
     cast: programme.credits?.actor?.map(act => act['_value']),
     directors: programme.credits?.director?.map(dir => dir['_value']),
-    ratings: programme.rating?.map(rat => ({ value: rat.value, system: rat.system }))
+    ratings: programme.rating
   }
 }
 
