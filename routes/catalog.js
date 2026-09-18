@@ -5,6 +5,7 @@ require('dotenv').config()//process.env.var
 
 const tveAPI = require('./rtve.js')
 const rtvePlayAPI = require('./rtvePlay.js')
+const EPGAPI = require('./epg.js')
 
 /**
  * Tipical express middleware callback.
@@ -45,7 +46,8 @@ function HandleCatalogRequest(req, res, next) {
     if (res.locals.extraParams?.skip !== undefined) {
       catalogPromise = Promise.reject("End of catalog")
       res.header('Cache-Control', "public, max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
-      res.json({ metas: [] })
+      if (req.params.videoId === "tv" && res.locals.extraParams?.date !== undefined) res.json({ metasDetailed: [] })
+      else res.json({ metas: [] })
       next()
     } else catalogPromise = tveAPI.GetChannels()
   } else if ((req.params.videoId === "search") && (res.locals.extraParams)) {
@@ -56,7 +58,23 @@ function HandleCatalogRequest(req, res, next) {
     console.log('\x1b[36mGot metadata for:\x1b[39m', result.length, "search results")
     const metas = result
     res.header('Cache-Control', "public, max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
-    res.json({ metas, message: "Got catalog metadata!" });
+    if (req.params.videoId === "tv" && res.locals.extraParams?.date !== undefined) {
+      const metaIDs = metas.map(m => m.name) //name = id without tve: before
+      const programmes = EPGAPI.GetEPGs(res.locals.extraParams.date, metas.map(m => m.name))
+      let metasDetailed = []
+      for (channel of metas) {
+        const chProgrammes = programmes.filter(prog => prog.id.startsWith(channel.id))
+        if (chProgrammes.length > 0) {
+          if (channel.behaviorHints === undefined) channel.behaviorHints = {}
+          channel.behaviorHints.hasScheduledVideos = true
+          channel.videos = chProgrammes
+        }
+        metasDetailed.push(channel)
+      }
+      res.json({ metasDetailed, message: "Got catalog metadata!" });
+    } else {
+      res.json({ metas, message: "Got catalog metadata!" });
+    }
     next()
   }).catch((err) => {
     console.error('\x1b[31mFailed on catalog search because:\x1b[39m ' + err)

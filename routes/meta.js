@@ -27,6 +27,14 @@ function HandleMetaRequest(req, res, next) {
     rtveAPI.GetChannel(req.params.videoId).then((result) => {
       console.log("\x1b[36mGot metadata for\x1b[39m", idDetails[1])
       res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
+      if (res.locals.extraParams?.date !== undefined) { // refresh EPG schedule request
+        const programmes = EPGAPI.GetEPGs(res.locals.extraParams.date, [result.name])
+        if (programmes.length > 0) {
+          if (result.behaviorHints === undefined) result.behaviorHints = {}
+          result.behaviorHints.hasScheduledVideos = true
+          result.videos = programmes
+        }
+      }
       res.json({ meta: result, message: "Got metadata!" });
       next()
     }).catch((err) => {

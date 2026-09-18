@@ -29,7 +29,8 @@ function ReadManifest() {
       "description": packageJSON.description,
       "catalogs": [
         {
-          id: "tv", type: "TV", name: "Live channels"/*,
+          id: "tv", type: "TV", name: "Live channels",
+          extra: [{ name: 'date' }]/*,
           extra: [{ name: "search", isRequired: false }]*/
         },
         {
@@ -59,7 +60,8 @@ function ReadManifest() {
       "stremioAddonsConfig": {
         "issuer": "https://stremio-addons.net",
         "signature": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..bukFRYB8W_R0x-j_ULi9eA.7II4HGscJIjpv6TJVDBGrLgaGx8K46j9nx6UT3Cb2jTXq_FCcJLFSHLsYKe0LG9NgNgo5tdmzgEhoWdUVU-UJc-fBivKTFbBP5EN7HkgmELkedoqRITFRxjLh_Am7CC8.s800KCeo0aFXP6oHCdyfwA"
-      }/*,
+      },
+      behaviorHints: { epgProvider: true }/*,
       "behaviorHints": { "configurable": true }*/
     }
     return manifest;
