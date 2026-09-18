@@ -48,6 +48,22 @@ const fs = require('fs');
 const zlib = require('zlib');
 const { parseXmltv } = require('@iptv/xmltv');
 
+exports.UpdateEPGFile = function () {
+  return fetch(process.env.EPG_FILE_URL).then((resp) => {
+    if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
+    if (resp === undefined) throw Error(`Undefined response!`)
+    return resp.text()
+  }).then((epg) => {
+    const filePathp = process.env.EPG_FILE_URL.split('/')
+    const filePath = filePathp[filePathp.length - 1]
+    console.log(`\x1b[36mGot EPG file\x1b[39m, saving to ${filePath}`)
+    fs.writeFileSync(`./${filePath}`, epg)
+  }).then(() => console.log('\x1b[32mEPG "cached" successfully!\x1b[39m')
+  ).catch((err) => {
+    console.error('\x1b[31mFailed "caching" EPG:\x1b[39m ' + err)
+  })
+}
+
 function DecompFile(filePath) {
   const compressedData = fs.readFileSync(filePath);
   const decompressedData = zlib.gunzipSync(compressedData);

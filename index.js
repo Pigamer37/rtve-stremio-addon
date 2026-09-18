@@ -132,4 +132,8 @@ app.listen(process.env.PORT || 3000, () => {
   rtveAPI.UpdateStationsFile().then(() => {
     setInterval(rtveAPI.UpdateStationsFile.bind(rtveAPI), 86400000); //Update every 24h
   })
+  const EPGAPI = require('./routes/epg.js')
+  EPGAPI.UpdateEPGFile().then(() => {
+    setInterval(EPGAPI.UpdateEPGFile.bind(EPGAPI), 86400000); //Update every 24h
+  })
 });
