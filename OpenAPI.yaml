@@ -131,10 +131,13 @@ components:
                   properties:
                     value:
                       type: string
+                      description: 'Rating label, e.g. "PG", "TV-14"'
                     system:
                       type: string
+                      description: 'Rating system, e.g. "MPAA", "TVPG"'
                     icon:
                       type: string
+                      description: Optional icon URL for the rating badge
 paths:
   /catalog/{type}/{ID}.json:
     get:

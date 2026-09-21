@@ -94,15 +94,15 @@ function ProgrammeToObj(programme, channelID) {
     title: programme.title?.[0]['_value'] + (programme.subTitle?.length > 1 ? `: ${programme.subTitle.map(sub => sub['_value']).join(', ')}` : ''),
     overview: programme.desc?.[0]['_value'],
     thumbnail: programme.icon?.[0]?.src || programme.image?.filter(img => (img.orient === 'L' || img.type === 'backdrop'))?.[0]?.['_value'],
-    released: programme.start,
+    released: programme.start, //maybe check the 'new' property?
     startTime: programme.start,
     endTime: programme.stop,
     runtime,
-    releaseInfo: programme.start.getFullYear().toString(),
+    releaseInfo: programme.previouslyShown?.start?.getFullYear().toString() || programme.start.getFullYear().toString(),
     genres: programme.category?.map(cat => cat['_value']),
     cast: programme.credits?.actor?.map(act => act['_value']),
     directors: programme.credits?.director?.map(dir => dir['_value']),
-    ratings: programme.rating
+    ratings: programme.rating?.map(rat => ({ value: rat.value, system: rat.system, icon: rat.icon[0].src }))
   }
 }
 
