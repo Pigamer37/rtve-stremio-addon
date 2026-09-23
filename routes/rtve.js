@@ -62,8 +62,8 @@ exports.GetRadiosFromWeb = async function () {
 }
 
 exports.GetChannels = async function () {
-  //return fsPromises.readFile('./channels.json') //local
-  return vercelUtils.GetVercelBlob('./channels.json').then((data) => JSON.parse(data)).catch((err) => {
+  //return fsPromises.readFile('./channels.json').then((data) => JSON.parse(data)) //local
+  return vercelUtils.GetVercelBlob('./channels.json').catch((err) => {
     console.error('\x1b[31mFailed reading channels cache:\x1b[39m ' + err)
     //return this.GetChannelsFromWeb() //If the file doesn't exist, get the titles from the web
     return this.UpdateChannelsFile()
@@ -71,8 +71,8 @@ exports.GetChannels = async function () {
 }
 
 exports.GetRadios = async function () {
-  //return fsPromises.readFile('./stations.json')
-  return vercelUtils.GetVercelBlob('./stations.json').then((data) => JSON.parse(data)).catch((err) => {
+  //return fsPromises.readFile('./stations.json').then((data) => JSON.parse(data)) //local
+  return vercelUtils.GetVercelBlob('./stations.json').catch((err) => {
     console.error('\x1b[31mFailed reading stations cache:\x1b[39m ' + err)
     //return this.GetRadiosFromWeb() //If the file doesn't exist, get the titles from the web
     return this.UpdateStationsFile()

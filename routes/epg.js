@@ -48,7 +48,7 @@ const vercelUtils = require("../lib/vercel-utils");
 const zlib = require('zlib');
 const { parseXmltv } = require('@iptv/xmltv');
 
-exports.UpdateEPGFile = function () {
+function UpdateEPGFile() {
   return fetch(process.env.EPG_FILE_URL).then((resp) => {
     if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
     if (resp === undefined) throw Error(`Undefined response!`)
@@ -68,11 +68,13 @@ exports.UpdateEPGFile = function () {
   })
 }
 
+exports.UpdateEPGFile = UpdateEPGFile
+
 async function GetCompressedFile(filePath) {
   //return Promise.resolve(fs.readFileSync(filePath)) //local
   return vercelUtils.GetVercelBlob(filePath, 'application/x-gzip').catch(err => {
     console.error('\x1b[31mFailed reading EPG cache:\x1b[39m ' + err)
-    return this.UpdateEPGFile()
+    return UpdateEPGFile()
   })
 }
 
