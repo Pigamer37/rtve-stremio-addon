@@ -58,20 +58,26 @@ exports.UpdateEPGFile = function () {
     const filePath = filePathp[filePathp.length - 1]
     console.log(`\x1b[36mGot EPG file\x1b[39m, saving to ${filePath}`)
     //fs.writeFileSync(`./${filePath}`, epg) //local
-    return vercelUtils.PutVercelBlob(`./${filePath}`, epg, 'application/x-gzip')
-  }).then(() => console.log('\x1b[32mEPG "cached" successfully!\x1b[39m'))
-    .catch((err) => {
-      console.error('\x1b[31mFailed "caching" EPG:\x1b[39m ' + err)
-    })
+    vercelUtils.PutVercelBlob(`./${filePath}`, epg, 'application/x-gzip')
+    return epg
+  }).then((epg) => {
+    console.log('\x1b[32mEPG "cached" successfully!\x1b[39m')
+    return epg
+  }).catch((err) => {
+    console.error('\x1b[31mFailed "caching" EPG:\x1b[39m ' + err)
+  })
 }
 
-async function GetDecompFile(filePath) {
+async function GetCompressedFile(filePath) {
   //return Promise.resolve(fs.readFileSync(filePath)) //local
-  return vercelUtils.GetVercelBlob(filePath, 'application/x-gzip')
+  return vercelUtils.GetVercelBlob(filePath, 'application/x-gzip').catch(err => {
+    console.error('\x1b[31mFailed reading EPG cache:\x1b[39m ' + err)
+    return this.UpdateEPGFile()
+  })
 }
 
 function DecompFile(filePath) {
-  return GetDecompFile(filePath).then(compressedData=>{
+  return GetCompressedFile(filePath).then(compressedData => {
     const decompressedData = zlib.gunzipSync(compressedData);
     // Convert the decompressed data to a string
     return decompressedData.toString('utf-8');
