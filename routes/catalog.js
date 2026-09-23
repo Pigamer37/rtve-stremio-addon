@@ -61,6 +61,7 @@ function HandleCatalogRequest(req, res, next) {
     if (req.params.videoId === "tv" && res.locals.extraParams?.date !== undefined) {
       EPGAPI.GetEPGs(res.locals.extraParams.date, metas.map(m => m.name)).then(programmes => {
         let metasDetailed = []
+        console.log('\x1b[36mGot:\x1b[39m', programmes.length, "programmes")
         for (channel of metas) {
           const chProgrammes = programmes.filter(prog => prog.id.startsWith(channel.id))
           if (chProgrammes.length > 0) {
