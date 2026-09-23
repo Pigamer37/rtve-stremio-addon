@@ -59,23 +59,24 @@ function HandleCatalogRequest(req, res, next) {
     const metas = result
     res.header('Cache-Control', "public, max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
     if (req.params.videoId === "tv" && res.locals.extraParams?.date !== undefined) {
-      const metaIDs = metas.map(m => m.name) //name = id without tve: before
-      const programmes = EPGAPI.GetEPGs(res.locals.extraParams.date, metas.map(m => m.name))
-      let metasDetailed = []
-      for (channel of metas) {
-        const chProgrammes = programmes.filter(prog => prog.id.startsWith(channel.id))
-        if (chProgrammes.length > 0) {
-          if (channel.behaviorHints === undefined) channel.behaviorHints = {}
-          channel.behaviorHints.hasScheduledVideos = true
-          channel.videos = chProgrammes
+      EPGAPI.GetEPGs(res.locals.extraParams.date, metas.map(m => m.name)).then(programmes => {
+        let metasDetailed = []
+        for (channel of metas) {
+          const chProgrammes = programmes.filter(prog => prog.id.startsWith(channel.id))
+          if (chProgrammes.length > 0) {
+            if (channel.behaviorHints === undefined) channel.behaviorHints = {}
+            channel.behaviorHints.hasScheduledVideos = true
+            channel.videos = chProgrammes
+          }
+          metasDetailed.push(channel)
         }
-        metasDetailed.push(channel)
-      }
-      res.json({ metasDetailed, message: "Got catalog metadata!" });
+        res.json({ metasDetailed, message: "Got catalog metadata!" });
+        next()
+      })
     } else {
       res.json({ metas, message: "Got catalog metadata!" });
+      next()
     }
-    next()
   }).catch((err) => {
     console.error('\x1b[31mFailed on catalog search because:\x1b[39m ' + err)
     if (!res.headersSent) {

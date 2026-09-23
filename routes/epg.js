@@ -44,6 +44,7 @@ const channelIDMap = new Map([
 ]);
 
 const fs = require('fs');
+const vercelUtils = require("../lib/vercel-utils");
 const zlib = require('zlib');
 const { parseXmltv } = require('@iptv/xmltv');
 
@@ -56,18 +57,25 @@ exports.UpdateEPGFile = function () {
     const filePathp = process.env.EPG_FILE_URL.split('/')
     const filePath = filePathp[filePathp.length - 1]
     console.log(`\x1b[36mGot EPG file\x1b[39m, saving to ${filePath}`)
-    fs.writeFileSync(`./${filePath}`, epg)
-  }).then(() => console.log('\x1b[32mEPG "cached" successfully!\x1b[39m')
-  ).catch((err) => {
-    console.error('\x1b[31mFailed "caching" EPG:\x1b[39m ' + err)
-  })
+    //fs.writeFileSync(`./${filePath}`, epg) //local
+    return vercelUtils.PutVercelBlob(`./${filePath}`, epg, 'application/x-gzip')
+  }).then(() => console.log('\x1b[32mEPG "cached" successfully!\x1b[39m'))
+    .catch((err) => {
+      console.error('\x1b[31mFailed "caching" EPG:\x1b[39m ' + err)
+    })
+}
+
+async function GetDecompFile(filePath) {
+  //return Promise.resolve(fs.readFileSync(filePath)) //local
+  return vercelUtils.GetVercelBlob(filePath, 'application/x-gzip')
 }
 
 function DecompFile(filePath) {
-  const compressedData = fs.readFileSync(filePath);
-  const decompressedData = zlib.gunzipSync(compressedData);
-  // Convert the decompressed data to a string
-  return decompressedData.toString('utf-8');
+  return GetDecompFile(filePath).then(compressedData=>{
+    const decompressedData = zlib.gunzipSync(compressedData);
+    // Convert the decompressed data to a string
+    return decompressedData.toString('utf-8');
+  })
 }
 
 function FilterProgrammesByDate(programmes, date) {
@@ -106,12 +114,13 @@ function ProgrammeToObj(programme, channelID) {
   }
 }
 
-exports.GetEPGs = function (date, channelIDs = undefined) {
+exports.GetEPGs = async function (date, channelIDs = undefined) {
   if (channelIDs === undefined || !Array.isArray(channelIDs)) channelIDs = Array.from(channelIDMap.keys())
   let programList = []
   try {
     const filePath = process.env.EPG_FILE_URL.split('/')
-    const json = parseXmltv(DecompFile(filePath[filePath.length - 1]));
+    const decomp = await DecompFile(filePath[filePath.length - 1])
+    const json = parseXmltv(decomp);
     const todayProgrammes = FilterProgrammesByDate(json.programmes, date);
     for (chID of channelIDs) {
       const channelProgs = FilterProgrammesByChannel(todayProgrammes, chID).map(prog => ProgrammeToObj(prog, chID)) //get channel's programmes and convert them

@@ -1,7 +1,8 @@
 const CHANNEL_JSON = "https://www.tdtchannels.com/lists/tv.json"
 const RADIO_JSON = "https://www.tdtchannels.com/lists/radio.json"
 
-const fsPromises = require("fs/promises");
+//const fsPromises = require("fs/promises"); //local
+const vercelUtils = require("../lib/vercel-utils");
 
 exports.GetChannelsFromWeb = async function () {
   return fetch(CHANNEL_JSON).then((resp) => {
@@ -61,14 +62,16 @@ exports.GetRadiosFromWeb = async function () {
 }
 
 exports.GetChannels = async function () {
-  return fsPromises.readFile('./channels.json').then((data) => JSON.parse(data)).catch((err) => {
+  //return fsPromises.readFile('./channels.json') //local
+  return vercelUtils.GetVercelBlob('./channels.json').then((data) => JSON.parse(data)).catch((err) => {
     console.error('\x1b[31mFailed reading channels cache:\x1b[39m ' + err)
     return this.GetChannelsFromWeb() //If the file doesn't exist, get the titles from the web
   })
 }
 
 exports.GetRadios = async function () {
-  return fsPromises.readFile('./stations.json').then((data) => JSON.parse(data)).catch((err) => {
+  //return fsPromises.readFile('./stations.json')
+  return vercelUtils.GetVercelBlob('./stations.json').then((data) => JSON.parse(data)).catch((err) => {
     console.error('\x1b[31mFailed reading stations cache:\x1b[39m ' + err)
     return this.GetRadiosFromWeb() //If the file doesn't exist, get the titles from the web
   })
@@ -89,7 +92,8 @@ exports.GetRadio = async function (radioID) {
 exports.UpdateChannelsFile = function () {
   return this.GetChannelsFromWeb().then((channels) => {
     console.log(`\x1b[36mGot ${channels.length} channels\x1b[39m, saving to channels.json`)
-    return fsPromises.writeFile('./channels.json', JSON.stringify(channels))
+    //return fsPromises.writeFile('./channels.json', JSON.stringify(channels)) //local
+    return vercelUtils.PutVercelBlob('channels.json', JSON.stringify(channels))
   }).then(() => console.log('\x1b[32mChannels "cached" successfully!\x1b[39m')
   ).catch((err) => {
     console.error('\x1b[31mFailed "caching" channels:\x1b[39m ' + err)
@@ -99,7 +103,8 @@ exports.UpdateChannelsFile = function () {
 exports.UpdateStationsFile = function () {
   return this.GetRadiosFromWeb().then((channels) => {
     console.log(`\x1b[36mGot ${channels.length} stations\x1b[39m, saving to stations.json`)
-    return fsPromises.writeFile('./stations.json', JSON.stringify(channels))
+    //return fsPromises.writeFile('./stations.json', JSON.stringify(channels)) //local
+    return vercelUtils.PutVercelBlob('stations.json', JSON.stringify(channels))
   }).then(() => console.log('\x1b[32mStations "cached" successfully!\x1b[39m')
   ).catch((err) => {
     console.error('\x1b[31mFailed "caching" stations:\x1b[39m ' + err)
