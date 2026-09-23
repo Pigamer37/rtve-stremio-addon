@@ -24,7 +24,8 @@ exports.GetChannelsFromWeb = async function () {
         country: "Spain",
         website: x.web,
         poster: x.logo,
-        posterShape: "square"
+        posterShape: "square",
+        behaviorHints: { isLive: true }
       }
     })
     return channels
@@ -51,7 +52,8 @@ exports.GetRadiosFromWeb = async function () {
         country: "Spain",
         website: x.web,
         poster: x.logo,
-        posterShape: "square"
+        posterShape: "square",
+        behaviorHints: { isLive: true }
       }
     })
     return stations

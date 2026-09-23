@@ -5,7 +5,7 @@ Node.js addon to add RTVE (Spanish Television and radio) functionallity to Strem
 
 ## Normal use:
 ### Install by copying <stremio://rtve-stremio-addon.vercel.app/manifest.json> on your browser or paste <https://rtve-stremio-addon.vercel.app/manifest.json> on the stremio addons search bar
-This addon provides metadata and streaming options for live Spanish Television channels and Radio stations (RTVE), and the on demand platform RTVE Play. It offers two catalogs with live TV channels and radio stations respectively, and RTVE Play search functionallity. Additionally, when you open one of the items, the platform will call this addon. When the program can get the data for the item you are requesting, some metadata will be provided and/or streaming options will be offered (the ones marked as external just open the link on your browser).
+This addon provides metadata and streaming options for live Spanish Television channels and Radio stations (RTVE), and the on demand platform RTVE Play. It offers two catalogs with live TV channels (and optionally their EPG, as per the new [Stremio standard](https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/epg.md)) and radio stations respectively, and RTVE Play search functionallity. Additionally, when you open one of the items, the platform will call this addon. When the program can get the data for the item you are requesting, some metadata will be provided and/or streaming options will be offered (the ones marked as external just open the link on your browser).
 
 ## Tips are welcome:
 If you like the addon and would like to thank me monetarily, you can do so through ko-fi. Thank you!\
@@ -21,6 +21,9 @@ Parameters
 1. `resource`: stream and meta are very self explanatory, and catalog exposes a list of channels.
 2. `type`: should not matter, but to make sure, use 'tv', 'radio', 'movie' or 'series' sepending on the expected result.
 3. `ID`: `tve:{channelName}`/`rne:{stationName}`/`rtvep:{RTVEPlayID}`. `channelName/stationName/RTVEPlayID` must be an exact match or it won't work.
+
+> [!TIP]
+> To request EPG data, follow the [Stremio standard for EPG](https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/epg.md)
 
 ## Run locally:
 > [!IMPORTANT]
