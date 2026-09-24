@@ -43,31 +43,50 @@ const channelIDMap = new Map([
   ["TVE Int. Europa", "TVEInternacional.es"]
 ]);
 
-const fs = require('fs');
+//const fs = require('fs');
+const vercelUtils = require("../lib/vercel-utils");
 const zlib = require('zlib');
 const { parseXmltv } = require('@iptv/xmltv');
 
-exports.UpdateEPGFile = function () {
+function UpdateEPGFile() {
   return fetch(process.env.EPG_FILE_URL).then((resp) => {
     if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
     if (resp === undefined) throw Error(`Undefined response!`)
-    return resp.text()
+    return resp.arrayBuffer()
   }).then((epg) => {
     const filePathp = process.env.EPG_FILE_URL.split('/')
     const filePath = filePathp[filePathp.length - 1]
     console.log(`\x1b[36mGot EPG file\x1b[39m, saving to ${filePath}`)
-    fs.writeFileSync(`./${filePath}`, epg)
-  }).then(() => console.log('\x1b[32mEPG "cached" successfully!\x1b[39m')
-  ).catch((err) => {
+    //fs.writeFileSync(`./${filePath}`, epg) //local
+    return vercelUtils.PutVercelBlob(filePath, Buffer.from(epg), 'application/x-gzip').then(() => epg)
+  }).then((epg) => {
+    console.log('\x1b[32mEPG "cached" successfully!\x1b[39m')
+    return epg
+  }).catch((err) => {
     console.error('\x1b[31mFailed "caching" EPG:\x1b[39m ' + err)
+    throw err
   })
 }
 
+exports.UpdateEPGFile = UpdateEPGFile
+
+async function GetCompressedFile(filePath) {
+  //return Promise.resolve(fs.readFileSync(filePath)) //local
+  return vercelUtils.GetVercelBlob(filePath, 'application/x-gzip').catch(err => {
+    console.error('\x1b[31mFailed reading EPG cache:\x1b[39m ' + err)
+    return UpdateEPGFile()
+  }).then(raw => Buffer.from(raw))
+}
+
 function DecompFile(filePath) {
-  const compressedData = fs.readFileSync(filePath);
-  const decompressedData = zlib.gunzipSync(compressedData);
-  // Convert the decompressed data to a string
-  return decompressedData.toString('utf-8');
+  return GetCompressedFile(filePath).then(compressedData => {
+    if (!compressedData?.length || compressedData.length < 2) throw Error('Invalid file');
+    const isGzip = compressedData[0] === 0x1f && compressedData[1] === 0x8b;
+    const decompressedData = isGzip ? zlib.gunzipSync(compressedData) : compressedData;
+    console.log(isGzip ? "Successfully decompressed" : "Already decompressed");
+    // Convert the decompressed data to a string
+    return decompressedData.toString('utf-8');
+  })
 }
 
 function FilterProgrammesByDate(programmes, date) {
@@ -80,7 +99,7 @@ function FilterProgrammesByDate(programmes, date) {
 }
 
 function FilterProgrammesByChannel(programmes, channelID) {
-  return programmes.filter(programme => programme.channel === channelIDMap.get(channelID))
+  return programmes.filter(programme => (programme.channel === channelID || programme.channel === channelIDMap.get(channelID)))
 }
 
 function ProgrammeToObj(programme, channelID) {
@@ -106,12 +125,13 @@ function ProgrammeToObj(programme, channelID) {
   }
 }
 
-exports.GetEPGs = function (date, channelIDs = undefined) {
+exports.GetEPGs = async function (date, channelIDs = undefined) {
   if (channelIDs === undefined || !Array.isArray(channelIDs)) channelIDs = Array.from(channelIDMap.keys())
   let programList = []
   try {
     const filePath = process.env.EPG_FILE_URL.split('/')
-    const json = parseXmltv(DecompFile(filePath[filePath.length - 1]));
+    const decomp = await DecompFile(filePath[filePath.length - 1])
+    const json = parseXmltv(decomp);
     const todayProgrammes = FilterProgrammesByDate(json.programmes, date);
     for (chID of channelIDs) {
       const channelProgs = FilterProgrammesByChannel(todayProgrammes, chID).map(prog => ProgrammeToObj(prog, chID)) //get channel's programmes and convert them
