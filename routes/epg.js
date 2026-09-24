@@ -52,7 +52,7 @@ function UpdateEPGFile() {
   return fetch(process.env.EPG_FILE_URL).then((resp) => {
     if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
     if (resp === undefined) throw Error(`Undefined response!`)
-    return resp.text()
+    return resp.arrayBuffer()
   }).then((epg) => {
     const filePathp = process.env.EPG_FILE_URL.split('/')
     const filePath = filePathp[filePathp.length - 1]
