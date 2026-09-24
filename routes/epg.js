@@ -72,19 +72,15 @@ exports.UpdateEPGFile = UpdateEPGFile
 
 async function GetCompressedFile(filePath) {
   //return Promise.resolve(fs.readFileSync(filePath)) //local
-  return vercelUtils.GetVercelBlob(filePath, 'application/x-gzip').then(raw => Buffer.from(raw)).catch(err => {
+  return vercelUtils.GetVercelBlob(filePath, 'application/x-gzip').catch(err => {
     console.error('\x1b[31mFailed reading EPG cache:\x1b[39m ' + err)
     return UpdateEPGFile()
-  })
+  }).then(raw => Buffer.from(raw))
 }
 
 function DecompFile(filePath) {
   return GetCompressedFile(filePath).then(compressedData => {
     if (!compressedData?.length || compressedData.length < 2) throw Error('Invalid file');
-    if (compressedData[0] === 0x1f && compressedData[1] === 0x8b) console.log('Compressed');
-    else console.log('Decompressed')
-    console.log(compressedData.slice(0, 200).toString('utf8'));
-    console.log(compressedData.slice(0, 2).toString('hex'))
     const isGzip = compressedData[0] === 0x1f && compressedData[1] === 0x8b;
     const decompressedData = isGzip ? zlib.gunzipSync(compressedData) : compressedData;
     console.log(isGzip ? "Successfully decompressed" : "Already decompressed");
@@ -135,13 +131,6 @@ exports.GetEPGs = async function (date, channelIDs = undefined) {
   try {
     const filePath = process.env.EPG_FILE_URL.split('/')
     const decomp = await DecompFile(filePath[filePath.length - 1])
-    const lines = decomp.split('\n');
-    console.log('Line 1135:', lines[1134]);
-    console.log('Line 1136:', lines[1135]);
-    console.log('Line 1137:', lines[1136]);
-    console.log('Line 1138:', lines[1137]);
-    console.log('Line 1139:', lines[1138]);
-
     const json = parseXmltv(decomp);
     const todayProgrammes = FilterProgrammesByDate(json.programmes, date);
     for (chID of channelIDs) {
