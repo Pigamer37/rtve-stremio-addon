@@ -81,11 +81,17 @@ async function GetCompressedFile(filePath) {
 function DecompFile(filePath) {
   return GetCompressedFile(filePath).then(compressedData => {
     if (!compressedData?.length || compressedData.length < 2) throw Error('Invalid file');
-    if (compressedData[0] === 0x1f && compressedData[1] === 0x8b) console.log('Compressed');
-    else console.log('Decompressed')
-    console.log(compressedData.slice(0, 200).toString('utf8'));
-    const decompressedData = (compressedData[0] === 0x1f && compressedData[1] === 0x8b) ? //check if file got decompressed by fetch
-      zlib.gunzipSync(compressedData) : compressedData;
+    let decompressedData;
+    try {
+        decompressedData = zlib.gunzipSync(compressedData);
+        console.log("Successfully decompressed");
+    } catch {
+        decompressedData = compressedData;
+        console.log("Already decompressed");
+    }
+
+    //const decompressedData = (compressedData[0] === 0x1f && compressedData[1] === 0x8b) ? //check if file got decompressed by fetch
+    //  zlib.gunzipSync(compressedData) : compressedData;
     // Convert the decompressed data to a string
     return decompressedData.toString('utf-8');
   })
