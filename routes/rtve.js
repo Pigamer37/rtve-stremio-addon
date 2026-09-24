@@ -131,7 +131,7 @@ exports.GetChannelStreams = function (channelName) {
       return (x.options.some((opt) => (opt.format !== "youtube" && opt.format !== "stream")) || x.options.length < 1) && x.name !== "El Toro TV"
     })))
     data.countries[1].ambits.filter((x) => ["Int. Europa"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) => x.name.includes("TVE"))))
-    if (channelName) channels = channels.filter((x) => x.name === channelName)
+    if (channelName) channels = channels.filter((x) => (x.epg_id === channelName || x.name === channelName))
     channels.forEach((x) => {
       for (const option of x.options) {
         if (option.format === "m3u8")
