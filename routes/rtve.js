@@ -18,7 +18,7 @@ exports.GetChannelsFromWeb = async function () {
     data.countries[1].ambits.filter((x) => ["Int. Europa"].includes(x.name)).forEach((x) => channels = channels.concat(x.channels.filter((x) => x.name.includes("TVE"))))
     channels = channels.map((x) => {
       return {
-        id: `tve:${x.name}`, //x.epg_id ???
+        id: `tve:${(x.epg_id) ? x.epg_id : x.name }`, //if epg_id is present, use it
         type: "tv",
         name: x.name,
         logo: x.logo,

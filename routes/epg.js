@@ -80,6 +80,9 @@ async function GetCompressedFile(filePath) {
 
 function DecompFile(filePath) {
   return GetCompressedFile(filePath).then(compressedData => {
+    if (!compressedData?.length || compressedData.length < 2) throw Error('Invalid file');
+    if (compressedData[0] === 0x1f && compressedData[1] === 0x8b) console.log('Compressed');
+    else console.log('Decompressed')
     const decompressedData = (compressedData[0] === 0x1f && compressedData[1] === 0x8b) ? //check if file got decompressed by fetch
       zlib.gunzipSync(compressedData) : compressedData;
     // Convert the decompressed data to a string
@@ -97,7 +100,7 @@ function FilterProgrammesByDate(programmes, date) {
 }
 
 function FilterProgrammesByChannel(programmes, channelID) {
-  return programmes.filter(programme => programme.channel === channelIDMap.get(channelID))
+  return programmes.filter(programme => (programme.channel === channelID || programme.channel === channelIDMap.get(channelID)))
 }
 
 function ProgrammeToObj(programme, channelID) {

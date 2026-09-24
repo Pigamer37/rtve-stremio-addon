@@ -59,7 +59,7 @@ function HandleCatalogRequest(req, res, next) {
     const metas = result
     res.header('Cache-Control', "public, max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
     if (req.params.videoId === "tv" && res.locals.extraParams?.date !== undefined) {
-      EPGAPI.GetEPGs(res.locals.extraParams.date, metas.map(m => m.name)).then(programmes => {
+      EPGAPI.GetEPGs(res.locals.extraParams.date, metas.map(m => m.id.replace("tve:",""))).then(programmes => {
         let metasDetailed = []
         console.log('\x1b[36mGot:\x1b[39m', programmes.length, "programmes")
         for (channel of metas) {

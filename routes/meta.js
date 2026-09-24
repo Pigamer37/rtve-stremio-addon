@@ -28,7 +28,7 @@ function HandleMetaRequest(req, res, next) {
     rtveAPI.GetChannel(req.params.videoId).then((result) => {
       console.log("\x1b[36mGot metadata for\x1b[39m", idDetails[1])
       res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
-      EPGAPI.GetEPGs(new Date(), [result.name]) // get programme guide for channel, now
+      EPGAPI.GetEPGs(new Date(), [result.id.replace("tve:","")]) // get programme guide for channel, now
         .then(programmes => {
           if (programmes.length > 0) {
             if (result.behaviorHints === undefined) result.behaviorHints = {}
