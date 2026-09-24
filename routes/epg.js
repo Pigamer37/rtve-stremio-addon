@@ -58,13 +58,13 @@ function UpdateEPGFile() {
     const filePath = filePathp[filePathp.length - 1]
     console.log(`\x1b[36mGot EPG file\x1b[39m, saving to ${filePath}`)
     //fs.writeFileSync(`./${filePath}`, epg) //local
-    vercelUtils.PutVercelBlob(filePath, epg, 'application/x-gzip')
-    return epg
+    return vercelUtils.PutVercelBlob(filePath, Buffer.from(epg), 'application/x-gzip').then(() => epg)
   }).then((epg) => {
     console.log('\x1b[32mEPG "cached" successfully!\x1b[39m')
     return epg
   }).catch((err) => {
     console.error('\x1b[31mFailed "caching" EPG:\x1b[39m ' + err)
+    throw err
   })
 }
 
@@ -85,14 +85,9 @@ function DecompFile(filePath) {
     else console.log('Decompressed')
     console.log(compressedData.slice(0, 200).toString('utf8'));
     console.log(compressedData.slice(0, 2).toString('hex'))
-    let decompressedData;
-    try {
-        decompressedData = zlib.gunzipSync(compressedData);
-        console.log("Successfully decompressed");
-    } catch {
-        decompressedData = compressedData;
-        console.log("Already decompressed");
-    }
+    const isGzip = compressedData[0] === 0x1f && compressedData[1] === 0x8b;
+    const decompressedData = isGzip ? zlib.gunzipSync(compressedData) : compressedData;
+    console.log(isGzip ? "Successfully decompressed" : "Already decompressed");
     // Convert the decompressed data to a string
     return decompressedData.toString('utf-8');
   })
