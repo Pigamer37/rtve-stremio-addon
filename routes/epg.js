@@ -43,7 +43,7 @@ const channelIDMap = new Map([
   ["TVE Int. Europa", "TVEInternacional.es"]
 ]);
 
-const fs = require('fs');
+//const fs = require('fs');
 const vercelUtils = require("../lib/vercel-utils");
 const zlib = require('zlib');
 const { parseXmltv } = require('@iptv/xmltv');
@@ -52,7 +52,7 @@ function UpdateEPGFile() {
   return fetch(process.env.EPG_FILE_URL).then((resp) => {
     if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
     if (resp === undefined) throw Error(`Undefined response!`)
-    return resp.text()
+    return resp.arrayBuffer()
   }).then((epg) => {
     const filePathp = process.env.EPG_FILE_URL.split('/')
     const filePath = filePathp[filePathp.length - 1]
@@ -83,6 +83,7 @@ function DecompFile(filePath) {
     if (!compressedData?.length || compressedData.length < 2) throw Error('Invalid file');
     if (compressedData[0] === 0x1f && compressedData[1] === 0x8b) console.log('Compressed');
     else console.log('Decompressed')
+    console.log(compressedData.slice(0, 200).toString('utf8'));
     const decompressedData = (compressedData[0] === 0x1f && compressedData[1] === 0x8b) ? //check if file got decompressed by fetch
       zlib.gunzipSync(compressedData) : compressedData;
     // Convert the decompressed data to a string
@@ -132,6 +133,13 @@ exports.GetEPGs = async function (date, channelIDs = undefined) {
   try {
     const filePath = process.env.EPG_FILE_URL.split('/')
     const decomp = await DecompFile(filePath[filePath.length - 1])
+    const lines = decomp.split('\n');
+    console.log('Line 1135:', lines[1134]);
+    console.log('Line 1136:', lines[1135]);
+    console.log('Line 1137:', lines[1136]);
+    console.log('Line 1138:', lines[1137]);
+    console.log('Line 1139:', lines[1138]);
+
     const json = parseXmltv(decomp);
     const todayProgrammes = FilterProgrammesByDate(json.programmes, date);
     for (chID of channelIDs) {
