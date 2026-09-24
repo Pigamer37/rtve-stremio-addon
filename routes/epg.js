@@ -52,7 +52,7 @@ function UpdateEPGFile() {
   return fetch(process.env.EPG_FILE_URL).then((resp) => {
     if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
     if (resp === undefined) throw Error(`Undefined response!`)
-    return resp.arrayBuffer()
+    return resp.text()
   }).then((epg) => {
     const filePathp = process.env.EPG_FILE_URL.split('/')
     const filePath = filePathp[filePathp.length - 1]
@@ -85,8 +85,14 @@ function DecompFile(filePath) {
     else console.log('Decompressed')
     console.log(compressedData.slice(0, 200).toString('utf8'));
     console.log(compressedData.slice(0, 2).toString('hex'))
-    const decompressedData = (compressedData[0] === 0x1f && compressedData[1] === 0x8b) ? //check if file got decompressed by fetch
-      zlib.gunzipSync(compressedData) : compressedData;
+    let decompressedData;
+    try {
+        decompressedData = zlib.gunzipSync(compressedData);
+        console.log("Successfully decompressed");
+    } catch {
+        decompressedData = compressedData;
+        console.log("Already decompressed");
+    }
     // Convert the decompressed data to a string
     return decompressedData.toString('utf-8');
   })
