@@ -90,11 +90,18 @@ function DecompFile(filePath) {
 }
 
 function FilterProgrammesByDate(programmes, date) {
-  const startOfDay = new Date(date).setHours(0, 0, 0, 0);
-  const endOfDay = new Date(date).setHours(23, 59, 59, 999);
+  let startTime, stopTime;
+  if (date !== undefined) { //provided date -> just today (catalog request)
+    startTime = new Date(date).setHours(0, 0, 0, 0);
+    stopTime = new Date(date).setHours(23, 59, 59, 999);
+  } else { //no date -> nearby programmes
+    const now = new Date()
+    startTime = new Date(now).setHours(now.getHours() - 2);
+    stopTime = new Date(now).setHours(now.getHours() + 10);
+  }
 
   return programmes.filter(programme => {
-    return programme.stop >= startOfDay && programme.start < endOfDay;
+    return programme.stop >= startTime && programme.start < stopTime;
   });
 }
 

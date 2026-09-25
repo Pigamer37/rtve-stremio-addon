@@ -27,23 +27,25 @@ function HandleMetaRequest(req, res, next) {
   if (videoID === "tve") {
     rtveAPI.GetChannel(req.params.videoId).then((result) => {
       console.log("\x1b[36mGot metadata for\x1b[39m", idDetails[1])
-      res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
-      EPGAPI.GetEPGs(new Date(), [idDetails[1]]) // get programme guide for channel, now
+      EPGAPI.GetEPGs(undefined, [idDetails[1]]) // get EPG for channel, nearby programmes
         .then(programmes => {
           if (programmes.length > 0) {
             if (result.behaviorHints === undefined) result.behaviorHints = {}
             result.behaviorHints.hasScheduledVideos = true
             result.videos = programmes
           }
+          res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=10800");
           res.json({ meta: result, message: "Got metadata!" });
           next()
         }).catch(err => {
+          res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
           res.json({ meta: result, message: `Failed getting EPG because: ${err}` });
           next()
         })
     }).catch((err) => {
       console.error('\x1b[31mFailed on tve id search:\x1b[39m ' + err)
       if (!res.headersSent) {
+        res.header('Cache-Control', "max-age=10800, stale-while-revalidate=3600, stale-if-error=259200");
         res.json({ meta: {}, message: "Failed getting tve channel info" });
         next()
       }
