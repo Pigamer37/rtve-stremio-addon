@@ -58,12 +58,13 @@ function UpdateEPGFile() {
     const filePath = filePathp[filePathp.length - 1]
     console.log(`\x1b[36mGot EPG file\x1b[39m, saving to ${filePath}`)
     //fs.writeFileSync(`./${filePath}`, epg) //local
-    return vercelUtils.PutVercelBlob(filePath, Buffer.from(epg), 'application/x-gzip').then(() => epg)
+    vercelUtils.PutVercelBlob(filePath, Buffer.from(epg), 'application/x-gzip').catch((err) => console.error('\x1b[31mFailed "caching" EPG:\x1b[39m ' + err))
+    return epg
   }).then((epg) => {
-    console.log('\x1b[32mEPG "cached" successfully!\x1b[39m')
+    console.log('\x1b[32mEPG fetched successfully!\x1b[39m')
     return epg
   }).catch((err) => {
-    console.error('\x1b[31mFailed "caching" EPG:\x1b[39m ' + err)
+    console.error('\x1b[31mFailed getting EPG:\x1b[39m ' + err)
     throw err
   })
 }
