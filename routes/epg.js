@@ -118,7 +118,7 @@ function ProgrammeToObj(programme, channelID) {
 
   return {
     id: `tve:${channelID}:epg:${programme.start.toISOString()}`,
-    title: programme.title?.[0]['_value'] + (programme.subTitle?.length > 1 ? `: ${programme.subTitle.map(sub => sub['_value']).join(', ')}` : ''),
+    title: programme.title?.[0]['_value'] + (programme.subTitle?.length >= 1 ? `: ${programme.subTitle.map(sub => sub['_value']).join(', ')}` : ''),
     overview: programme.desc?.[0]['_value'],
     thumbnail: programme.icon?.[0]?.src || programme.image?.filter(img => (img.orient === 'L' || img.type === 'backdrop'))?.[0]?.['_value'],
     released: programme.start, //maybe check the 'new' property?
