@@ -48,6 +48,19 @@ const vercelUtils = require("../lib/vercel-utils");
 const zlib = require('zlib');
 const { parseXmltv } = require('@iptv/xmltv');
 
+function unescapeHTML(str){
+  if (typeof str !== 'string') return str
+  str = str.replace(/&lt;/g, '<')
+  str = str.replace(/&gt;/g, '>')
+  str = str.replace(/&quot;/g, '"')
+  str = str.replace(/&apos;/g, "'")
+  str = str.replace(/&#(\d+);/g, (match, num) => String.fromCodePoint(Number(num)))
+  str = str.replace(/&#x([0-9a-fA-F]+);/g, (match, num) => String.fromCodePoint(parseInt(num,16)))
+  str = str.replace(/&amp;/g, '&')
+  return str
+}
+
+  
 function UpdateEPGFile() {
   return fetch(process.env.EPG_FILE_URL).then((resp) => {
     if ((!resp.ok) || resp.status !== 200) throw Error(`HTTP error! Status: ${resp.status}`)
@@ -118,17 +131,17 @@ function ProgrammeToObj(programme, channelID) {
 
   return {
     id: `tve:${channelID}:epg:${programme.start.toISOString()}`,
-    title: programme.title?.[0]['_value'] + (programme.subTitle?.length > 1 ? `: ${programme.subTitle.map(sub => sub['_value']).join(', ')}` : ''),
-    overview: programme.desc?.[0]['_value'],
+    title: unescapeHTML(programme.title?.[0]['_value'] + (programme.subTitle?.length > 1 ? `: ${programme.subTitle.map(sub => sub['_value']).join(', ')}` : '')),
+    overview: unescapeHTML(programme.desc?.[0]['_value']),
     thumbnail: programme.icon?.[0]?.src || programme.image?.filter(img => (img.orient === 'L' || img.type === 'backdrop'))?.[0]?.['_value'],
     released: programme.start, //maybe check the 'new' property?
     startTime: programme.start,
     endTime: programme.stop,
     runtime,
     releaseInfo: programme.previouslyShown?.start?.getFullYear().toString() || programme.start.getFullYear().toString(),
-    genres: programme.category?.map(cat => cat['_value']),
-    cast: programme.credits?.actor?.map(act => act['_value']),
-    directors: programme.credits?.director?.map(dir => dir['_value']),
+    genres: programme.category?.map(cat => unescapeHTML(cat['_value'])),
+    cast: programme.credits?.actor?.map(act => unescapeHTML(act['_value'])),
+    directors: programme.credits?.director?.map(dir => unescapeHTML(dir['_value'])),
     ratings: programme.rating?.map(rat => ({ value: rat.value, system: rat.system, icon: rat.icon[0].src }))
   }
 }
