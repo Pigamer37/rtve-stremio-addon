@@ -116,11 +116,19 @@ function ProgrammeToObj(programme, channelID) {
   else if (programme.length?.units === 'seconds') runtime = `${Math.floor(programme.length['_value'] / 60)} min`
   else if (programme.stop) runtime = `${Math.floor((programme.stop - programme.start) / (1000 * 60))} min`
 
+  const background = programme.image?.filter(img => (img?.orient === 'L' || img?.type === 'backdrop')).sort((a, b) => { //bigger to smaller sizes, then unknown
+    if (b?.size === undefined && a?.size === undefined) return 0;
+    else if (a?.size === undefined && b?.size !== undefined) return 1;
+    else if (b?.size === undefined && a?.size !== undefined) return -1;
+    else return Number(b.size) - Number(a.size)
+  })?.[0]?.['_value']
+
   return {
     id: `tve:${channelID}:epg:${programme.start.toISOString()}`,
     title: programme.title?.[0]['_value'] + (programme.subTitle?.length >= 1 ? `: ${programme.subTitle.map(sub => sub['_value']).join(', ')}` : ''),
     overview: programme.desc?.[0]['_value'],
-    thumbnail: programme.icon?.[0]?.src || programme.image?.filter(img => (img.orient === 'L' || img.type === 'backdrop'))?.[0]?.['_value'],
+    thumbnail: programme.icon?.[0]?.src || background,
+    background,
     released: programme.start, //maybe check the 'new' property?
     startTime: programme.start,
     endTime: programme.stop,
